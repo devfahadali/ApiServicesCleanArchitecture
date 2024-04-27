@@ -1,9 +1,9 @@
-package com.example.apiservicescleanarchitecture.models
+package com.example.data.models
 
 /**
  *@Author: Fahad Ali
  *@Email:  dev.fahadshabbir@gmail.com
- *@Date: 25/04/2024
+ *@Date: 27/04/2024
  */
 data class ProductList(
     val responseCode: Long,

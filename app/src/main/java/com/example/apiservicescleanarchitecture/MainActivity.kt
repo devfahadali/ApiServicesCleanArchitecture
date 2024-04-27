@@ -1,58 +1,46 @@
 package com.example.apiservicescleanarchitecture
 
-import android.os.Bundle
-import android.util.Log
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import android.view.View
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.apiservicescleanarchitecture.adapters.ProductListAdapter
-import com.example.apiservicescleanarchitecture.api.ProductApi
 import com.example.apiservicescleanarchitecture.databinding.ActivityMainBinding
-import com.example.apiservicescleanarchitecture.models.Product
-import com.example.apiservicescleanarchitecture.retofit.RetrofitHelper
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.example.apiservicescleanarchitecture.view.models.ProductViewModel
+import com.example.base.activity.BaseActivity
+import com.example.base.adapter.extension.setLayoutManager
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-    private var mutableList: MutableList<Product> = mutableListOf()
-    private lateinit var productListAdapter: ProductListAdapter
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        adapterSet()
-        apiCall()
+class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
+    override fun initView() {
+        productViewModel.getProductList()
+        initAdapter()
+        setupRecyclerView()
+        setupObserver()
 
     }
+    private lateinit var productListAdapter: ProductListAdapter
+    private val productViewModel : ProductViewModel by viewModel()
 
-    fun adapterSet() {
+    private fun adapterSet() {
         productListAdapter = ProductListAdapter()
-
         binding.rvProductShow.layoutManager = LinearLayoutManager(this)
         binding.rvProductShow.setHasFixedSize(true)
         binding.rvProductShow.adapter = productListAdapter
         binding.rvProductShow.itemAnimator = DefaultItemAnimator()
     }
 
-    fun apiCall() {
-        val productApi = RetrofitHelper.getInstance().create(ProductApi::class.java)
-
-
-
-        GlobalScope.launch {
-
-            val result = productApi.getProductList()
-            val productList = result.body()!!
-
-            mutableList.addAll(productList.products)
-
-            productListAdapter.submitList(mutableList)
-
-            Log.d("resultsProduct", result.body().toString())
+    private fun initAdapter() {
+        productListAdapter = ProductListAdapter()
+    }
+    private fun setupRecyclerView() {
+        binding.rvProductShow.adapter = productListAdapter
+        binding.rvProductShow.setHasFixedSize(true)
+        binding.rvProductShow.setLayoutManager()
+    }
+    private fun setupObserver() {
+        productViewModel.productData.observer{
+            binding.mPrograss.visibility = View.GONE
+            productListAdapter.submitList(it)
         }
 
     }

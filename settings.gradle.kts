@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "ApiServicesCleanArchitecture"
 include(":app")
- 
+include(":base")
+include(":baseNetwork")
+include(":data")
+include(":domain")
